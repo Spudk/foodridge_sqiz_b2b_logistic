@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>푸드릿지 물류 발주 시스템</title>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-group input:focus, 
+        .form-group select:focus, 
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        .warehouse-info {
+            background: #e8f5e8;
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #c8e6c9;
+            margin-bottom: 20px;
+        }
+
+        .warehouse-info h3 {
+            color: #2e7d32;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .warehouse-details {
+            font-size: 0.95em;
+            line-height: 1.6;
+            color: #1b5e20;
+        }
+
+        .pallet-section {
+            background: #f1f8ff;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #e3f2fd;
+            margin-top: 15px;
+        }
+
+        .pallet-section h3 {
+            color: #1976d2;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .info-box {
+            background: #fff3e0;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            border-left: 4px solid #ff9800;
+        }
+
+        .info-box h4 {
+            color: #e65100;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            font-size: 0.9em;
+            color: #bf360c;
+        }
+
+        .info-item {
+            background: rgba(255, 152, 0, 0.1);
+            padding: 8px 12px;
+            border-radius: 5px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #667eea;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            font-size: 1.1em;
+            cursor: pointer;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .quantity-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .quantity-btn:hover {
+            background: #5a6fd8;
+            transform: scale(1.1);
+        }
+
+        .quantity-btn:active {
+            transform: scale(0.95);
+        }
+
+        .auto-calc {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            border: 1px solid #c8e6c9;
+        }
+
+        .auto-calc h4 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            font-size: 0.9em;
+        }
+
+        .calc-item {
+            background: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: 1px solid #a5d6a7;
+        }
+
+        .pallet-layer-option {
+            background: #f3e5f5;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 2px solid #e1bee7;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .preview-btn, .submit-btn {
+            padding: 15px 35px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .preview-btn {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .preview-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            padding-bottom: 100px;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .preview-content {
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .preview-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .preview-section h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .modal-footer {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 20px 0;
+            border-top: 2px solid #e1e8ed;
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .modal-btn {
+            padding: 15px 35px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .modal-btn-close {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .modal-btn-close:hover {
+            background: #7f8c8d;
+        }
+
+        .modal-btn-send {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .modal-btn-send:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .modal-btn-send:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @media (max-width: 768px) {
+            .form-row, .form-row-3 {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                margin: 10px;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+
+            .info-grid, .calc-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .preview-btn, .submit-btn {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+
+        .success-message, .error-message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-left: 4px solid #f39c12;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>푸드릿지</h1>
+            <p>스퀴즈 감자 물류 발주 시스템</p>
+        </div>
+        
+        <div class="form-container">
+            <div class="success-message" id="successMessage">
+                발주 정보가 성공적으로 전송되었습니다!
+            </div>
+            
+            <div class="error-message" id="errorMessage">
+                전송 중 오류가 발생했습니다. 다시 시도해주세요.
+            </div>
+            
+            <form id="logisticsForm">
+                <!-- 창고 정보 -->
+                <div class="warehouse-info">
+                    <h3>📍 출발지 창고 정보</h3>
+                    <div class="warehouse-details">
+                        <strong>KCP 동안성 콜드체인센터</strong><br>
+                        주소: 경기도 안성시 일죽면 주천리 73번지<br>
+                        담당자: 박기천 팀장님 (010-7706-7877)<br>
+                        <strong style="color: #d32f2f;">※ 비고: 목적지 도착후 우측램프 진입</strong>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="loadingTime">상차시간</label>
+                        <input type="text" id="loadingTime" name="loadingTime" placeholder="예: 2025-09-30 09:00" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="productName">제품명</label>
+                        <input type="text" id="productName" name="productName" value="[FR02001] 스퀴즈 9mm 코팅감자 12kg" placeholder="제품명을 입력하세요" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="boxCount">박스수</label>
+                    <input type="number" id="boxCount" name="boxCount" value="40" min="1" required>
+                    <div class="quantity-controls">
+                        <button type="button" class="quantity-btn" onclick="adjustQuantity(-40)">-</button>
+                        <span>40박스 단위 권장 (수기 입력 가능)</span>
+                        <button type="button" class="quantity-btn" onclick="adjustQuantity(40)">+</button>
+                    </div>
+                </div>
+
+                <!-- 파레트 사용 여부 -->
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="usePallet" name="usePallet">
+                        <label for="usePallet">파레트 사용</label>
+                    </div>
+                </div>
+
+                <!-- 파레트 정보 박스 -->
+                <div class="info-box">
+                    <h4>📦 물류 정보</h4>
+                    <div class="info-grid">
+                        <div class="info-item">파레트당 적재: 40박스 (1단 8박스 × 5단)</div>
+                        <div class="info-item">박스 높이: 26cm</div>
+                        <div class="info-item">박스 중량: 12kg</div>
+                        <div class="info-item">파레트 높이: 15cm</div>
+                        <div class="info-item">최대 적재: 5단 (130cm)</div>
+                        <div class="info-item">총 파레트 높이: 145cm (파레트 15cm + 박스 130cm)</div>
+                    </div>
+                </div>
+
+                <!-- 파레트 사용시 정보 -->
+                <div id="palletSection" class="pallet-section hidden">
+                    <h3>파레트 정보</h3>
+                    
+                    <!-- 파레트 2단 깔기 옵션 -->
+                    <div class="pallet-layer-option">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="doublePallet" name="doublePallet">
+                            <label for="doublePallet">파레트 2단 깔기 (파레트 높이 30cm)</label>
+                        </div>
+                    </div>
+
+                    <div class="form-row-3">
+                        <div class="form-group">
+                            <label for="itemsPerPallet">파레트당 상품적재</label>
+                            <input type="number" id="itemsPerPallet" name="itemsPerPallet" value="40" min="1" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="palletHeight">총 파레트 높이 (cm)</label>
+                            <input type="number" id="palletHeight" name="palletHeight" min="145" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="palletCount">파레트 수</label>
+                            <input type="number" id="palletCount" name="palletCount" min="1" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="auto-calc">
+                        <h4>🔄 자동 계산 결과</h4>
+                        <div class="calc-grid" id="calcResults">
+                            <!-- 계산 결과가 여기에 표시됩니다 -->
+                        </div>
+                    </div>
+
+                    <div id="warningBox" class="warning-box hidden">
+                        ⚠️ 박스 수가 파레트 최대 적재량을 초과합니다. 추가 파레트가 필요합니다.
+                    </div>
+                </div>
+
+                <!-- 파레트 미사용시 정보 -->
+                <div id="manualSection" class="pallet-section">
+                    <h3>수작업 정보</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="loadingManual" name="loadingManual">
+                                <label for="loadingManual">상차시 기사 수작업</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="unloadingManual" name="unloadingManual">
+                                <label for="unloadingManual">하차시 기사 수작업</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 도착 정보 -->
+                <div class="form-group">
+                    <label for="logisticsEmail">물류사 이메일 주소</label>
+                    <input type="email" id="logisticsEmail" name="logisticsEmail" value="kelly@foodridge.co.kr" placeholder="물류사 이메일 주소를 입력하세요" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="destination">도착지 주소</label>
+                        <textarea id="destination" name="destination" rows="3" placeholder="도착지 주소를 입력하세요" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="destinationContact">도착지 담당자 연락처</label>
+                        <input type="text" id="destinationContact" name="destinationContact" placeholder="담당자명 및 연락처를 입력하세요" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="arrivalTime">도착 요청시간 (날짜 및 시간)</label>
+                    <input type="text" id="arrivalTime" name="arrivalTime" placeholder="예: 2025-09-30 15:00" required>
+                </div>
+
+                <!-- 기타 요청사항 -->
+                <div class="form-group">
+                    <label for="additionalRequests">기타 요청사항</label>
+                    <textarea id="additionalRequests" name="additionalRequests" rows="4" placeholder="추가 요청사항이나 특별한 지시사항을 입력하세요 (선택사항)"></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="preview-btn" onclick="showPreview()">
+                        미리보기
+                    </button>
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        발주 신청하기
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 미리보기 모달 -->
+    <div id="previewModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closePreview()">&times;</span>
+            <h2 style="margin-bottom: 20px; color: #2c3e50;">📋 발주 신청서 미리보기</h2>
+            <div id="previewContent" class="preview-content">
+                <!-- 미리보기 내용이 여기에 표시됩니다 -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="modal-btn modal-btn-close" onclick="closePreview()">
+                    닫기
+                </button>
+                <button type="button" class="modal-btn modal-btn-send" id="sendFromPreviewBtn" onclick="sendFromPreview()">
+                    발주서 전송
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // EmailJS 초기화
+        emailjs.init("1gH_A1Z-LUzYv3JUz");
+
+        // 박스 수량 조절 함수
+        function adjustQuantity(amount) {
+            const boxCountInput = document.getElementById('boxCount');
+            let currentValue = parseInt(boxCountInput.value) || 0;
+            const newValue = Math.max(40, currentValue + amount);
+            boxCountInput.value = newValue;
+            
+            // 파레트 계산 업데이트
+            if (document.getElementById('usePallet').checked) {
+                updatePalletCalculations();
+            }
+        }
+
+        // 파레트 계산 업데이트 함수
+        function updatePalletCalculations() {
+            const boxCount = parseInt(document.getElementById('boxCount').value) || 0;
+            const itemsPerPallet = 40; // 1파레트당 40박스 (8박스 × 5단)
+            const boxHeight = 26; // cm
+            const singlePalletHeight = 15; // cm
+            const boxWeight = 12; // kg
+            const maxBoxesPerPallet = 40; // 최대 40박스
+            const doublePallet = document.getElementById('doublePallet').checked;
+
+            // 파레트 기본 높이 설정
+            const palletBaseHeight = doublePallet ? 30 : 15; // 2단이면 30cm, 1단이면 15cm
+            
+            // 파레트 수 계산
+            const palletCount = Math.ceil(boxCount / itemsPerPallet);
+            
+            // 각 파레트별 박스 수 계산
+            const fullPallets = Math.floor(boxCount / itemsPerPallet);
+            const remainingBoxes = boxCount % itemsPerPallet;
+            
+            // 한 파레트의 최대 높이 계산 (박스 5단 = 130cm)
+            const maxBoxHeight = 5 * boxHeight; // 130cm
+            const totalHeight = palletBaseHeight + maxBoxHeight; // 파레트 + 박스
+            
+            // 실제 마지막 파레트의 높이 계산
+            const boxesOnLastPallet = remainingBoxes > 0 ? remainingBoxes : itemsPerPallet;
+            const layersOnLastPallet = Math.ceil(boxesOnLastPallet / 8); // 1단에 8박스
+            const lastPalletBoxHeight = layersOnLastPallet * boxHeight;
+            const lastPalletTotalHeight = palletBaseHeight + lastPalletBoxHeight;
+            
+            // 총 중량 계산
+            const totalWeight = boxCount * boxWeight;
+
+            // 필드 업데이트
+            document.getElementById('palletCount').value = palletCount;
+            document.getElementById('palletHeight').value = totalHeight;
+
+            // 경고 메시지 표시/숨김
+            const warningBox = document.getElementById('warningBox');
+            if (boxCount > maxBoxesPerPallet * palletCount) {
+                warningBox.classList.remove('hidden');
+            } else {
+                warningBox.classList.add('hidden');
+            }
+
+            // 계산 결과 표시
+            const calcResults = document.getElementById('calcResults');
+            calcResults.innerHTML = `
+                <div class="calc-item">총 파레트: ${palletCount}개</div>
+                <div class="calc-item">완전 파레트: ${fullPallets}개</div>
+                ${remainingBoxes > 0 ? `<div class="calc-item">부분 파레트: 1개 (${remainingBoxes}박스)</div>` : ''}
+                <div class="calc-item">파레트 기본높이: ${palletBaseHeight}cm</div>
+                <div class="calc-item">최대 파레트 높이: ${totalHeight}cm</div>
+                <div class="calc-item">마지막 파레트 높이: ${lastPalletTotalHeight}cm</div>
+                <div class="calc-item">총 중량: ${totalWeight}kg</div>
+                <div class="calc-item">마지막 파레트 층수: ${layersOnLastPallet}층</div>
+            `;
+        }
+
+        // 파레트 사용 여부에 따른 동적 필드 표시
+        document.getElementById('usePallet').addEventListener('change', function() {
+            const palletSection = document.getElementById('palletSection');
+            const manualSection = document.getElementById('manualSection');
+            
+            if (this.checked) {
+                palletSection.classList.remove('hidden');
+                manualSection.classList.add('hidden');
+                
+                // 파레트 계산 실행
+                updatePalletCalculations();
+                
+                // 수작업 필드 초기화
+                document.getElementById('loadingManual').checked = false;
+                document.getElementById('unloadingManual').checked = false;
+            } else {
+                palletSection.classList.add('hidden');
+                manualSection.classList.remove('hidden');
+            }
+        });
+
+        // 파레트 2단 깔기 옵션 변경시 계산 업데이트
+        document.getElementById('doublePallet').addEventListener('change', function() {
+            if (document.getElementById('usePallet').checked) {
+                updatePalletCalculations();
+            }
+        });
+
+        // 박스 수 변경시 파레트 계산 업데이트
+        document.getElementById('boxCount').addEventListener('input', function() {
+            if (document.getElementById('usePallet').checked) {
+                updatePalletCalculations();
+            }
+        });
+
+        // 미리보기 함수
+        function showPreview() {
+            const formData = new FormData(document.getElementById('logisticsForm'));
+            const data = Object.fromEntries(formData);
+            
+            // 체크박스 값 처리
+            data.usePallet = document.getElementById('usePallet').checked;
+            data.doublePallet = document.getElementById('doublePallet').checked;
+            data.loadingManual = document.getElementById('loadingManual').checked;
+            data.unloadingManual = document.getElementById('unloadingManual').checked;
+            data.logisticsEmail = document.getElementById('logisticsEmail').value;
+            
+            const previewContent = generatePreviewContent(data);
+            document.getElementById('previewContent').innerHTML = previewContent;
+            document.getElementById('previewModal').style.display = 'block';
+            
+            // 전역 변수에 폼 데이터 저장 (미리보기에서 전송할 때 사용)
+            window.currentFormData = data;
+        }
+
+        function closePreview() {
+            document.getElementById('previewModal').style.display = 'none';
+        }
+
+        // 미리보기에서 바로 전송하는 함수
+        function sendFromPreview() {
+            const sendFromPreviewBtn = document.getElementById('sendFromPreviewBtn');
+            const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // 버튼 상태 변경
+            sendFromPreviewBtn.disabled = true;
+            sendFromPreviewBtn.innerHTML = '<span class="loading"></span>전송 중...';
+            
+            // 메시지 숨기기
+            successMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
+            
+            // 저장된 폼 데이터 사용
+            const data = window.currentFormData;
+            
+            // 창고 정보 추가
+            data.warehouseName = "KCP 동안성 콜드체인센터";
+            data.warehouseAddress = "경기도 안성시 일죽면 주천리 73번지";
+            data.warehouseContact = "박기천 팀장님 (010-7706-7877)";
+            data.warehouseNote = "목적지 도착후 우측램프 진입";
+            
+            // 계산된 정보 추가
+            if (data.usePallet) {
+                const boxCount = parseInt(data.boxCount);
+                const totalWeight = boxCount * 12;
+                const palletCount = Math.ceil(boxCount / 40);
+                data.totalWeight = totalWeight;
+                data.calculatedInfo = `총 중량: ${totalWeight}kg, 파레트 수: ${palletCount}개`;
+            }
+
+            // 회신 링크 생성을 위한 발주 정보 인코딩
+            const orderId = 'ORD' + Date.now();
+            const responseUrl = generateResponseUrl({
+                orderId: orderId,
+                loadingTime: data.loadingTime,
+                product: data.productName,
+                boxCount: data.boxCount,
+                destination: data.destination,
+                contact: data.destinationContact,
+                arrivalTime: data.arrivalTime,
+                usePallet: data.usePallet,
+                palletCount: data.usePallet ? Math.ceil(parseInt(data.boxCount) / 40) : 0,
+                palletLayers: data.doublePallet ? '2단 (30cm)' : '1단 (15cm)'
+            });
+
+            // EmailJS로 이메일 전송
+            emailjs.send("service_9od6tgr", "template_xk0n34j", {
+                to_email: data.logisticsEmail,
+                from_email: "kelly@foodridge.co.kr",
+                warehouse_name: data.warehouseName,
+                warehouse_address: data.warehouseAddress,
+                warehouse_contact: data.warehouseContact,
+                warehouse_note: data.warehouseNote,
+                loading_time: data.loadingTime,
+                product_name: data.productName,
+                box_count: data.boxCount,
+                total_weight: (parseInt(data.boxCount) * 12).toString(),
+                use_pallet: data.usePallet ? "예" : "아니오",
+                pallet_layers: data.doublePallet ? "2단 (30cm)" : "1단 (15cm)",
+                pallet_count: data.usePallet ? Math.ceil(parseInt(data.boxCount) / 40).toString() : "0",
+                pallet_height: data.palletHeight || "0",
+                loading_manual: data.loadingManual ? "예" : "아니오",
+                unloading_manual: data.unloadingManual ? "예" : "아니오",
+                destination_address: data.destination,
+                destination_contact: data.destinationContact,
+                arrival_time: data.arrivalTime,
+                additional_requests: data.additionalRequests || "없음",
+                order_date: new Date().toLocaleString('ko-KR'),
+                response_url: responseUrl
+            })
+                .then(function(response) {
+                    console.log('SUCCESS!', response.status, response.text);
+                    
+                    // 미리보기 모달 닫기
+                    closePreview();
+                    
+                    // 성공 메시지 표시
+                    successMessage.style.display = 'block';
+                    document.querySelector('.container').scrollIntoView({ behavior: 'smooth' });
+                }, function(error) {
+                    console.log('FAILED...', error);
+                    
+                    // 미리보기 모달 닫기
+                    closePreview();
+                    
+                    // 에러 메시지 표시
+                    errorMessage.textContent = '전송 중 오류가 발생했습니다: ' + error.text;
+                    errorMessage.style.display = 'block';
+                    document.querySelector('.container').scrollIntoView({ behavior: 'smooth' });
+                })
+                .finally(function() {
+                    // 버튼 상태 복원
+                    sendFromPreviewBtn.disabled = false;
+                    sendFromPreviewBtn.innerHTML = '발주서 전송';
+                });
+        }
+
+        // 모달 외부 클릭시 닫기
+        window.onclick = function(event) {
+            const modal = document.getElementById('previewModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        function generatePreviewContent(data) {
+            const loadingDateTime = data.loadingTime || '미입력';
+            const arrivalDateTime = data.arrivalTime || '미입력';
+            
+            let content = `
+                <div class="preview-section">
+                    <h4>🏢 출발지 정보</h4>
+                    <p><strong>창고명:</strong> KCP 동안성 콜드체인센터</p>
+                    <p><strong>주소:</strong> 경기도 안성시 일죽면 주천리 73번지</p>
+                    <p><strong>담당자:</strong> 박기천 팀장님 (010-7706-7877)</p>
+                    <p><strong>비고:</strong> <span style="color: #d32f2f;">목적지 도착후 우측램프 진입</span></p>
+                    <p><strong>상차시간:</strong> ${loadingDateTime}</p>
+                </div>
+
+                <div class="preview-section">
+                    <h4>📦 상품 정보</h4>
+                    <p><strong>제품명:</strong> ${data.productName || '미입력'}</p>
+                    <p><strong>박스수:</strong> ${data.boxCount || '0'}개</p>
+                    <p><strong>총 중량:</strong> ${(parseInt(data.boxCount) || 0) * 12}kg</p>
+                </div>
+
+                <div class="preview-section">
+                    <h4>🚛 파레트 정보</h4>`;
+
+            if (data.usePallet) {
+                const boxCount = parseInt(data.boxCount) || 0;
+                const palletCount = Math.ceil(boxCount / 40);
+                const fullPallets = Math.floor(boxCount / 40);
+                const remainingBoxes = boxCount % 40;
+                const palletBaseHeight = data.doublePallet ? 30 : 15;
+                const totalHeight = palletBaseHeight + 130; // 최대 높이
+                
+                content += `
+                    <p><strong>파레트 사용:</strong> 예</p>
+                    <p><strong>파레트 깔기:</strong> ${data.doublePallet ? '2단 (30cm)' : '1단 (15cm)'}</p>
+                    <p><strong>총 파레트 수:</strong> ${palletCount}개</p>
+                    <p><strong>완전 파레트:</strong> ${fullPallets}개</p>
+                    ${remainingBoxes > 0 ? `<p><strong>부분 파레트:</strong> 1개 (${remainingBoxes}박스)</p>` : ''}
+                    <p><strong>파레트당 적재량:</strong> 40박스</p>
+                    <p><strong>최대 파레트 높이:</strong> ${totalHeight}cm</p>`;
+            } else {
+                content += `
+                    <p><strong>파레트 사용:</strong> 아니오</p>
+                    <p><strong>상차시 기사 수작업:</strong> ${data.loadingManual ? '예' : '아니오'}</p>
+                    <p><strong>하차시 기사 수작업:</strong> ${data.unloadingManual ? '예' : '아니오'}</p>`;
+            }
+
+            content += `
+                </div>
+
+                <div class="preview-section">
+                    <h4>📍 도착지 정보</h4>
+                    <p><strong>도착지 주소:</strong> ${data.destination || '미입력'}</p>
+                    <p><strong>담당자 연락처:</strong> ${data.destinationContact || '미입력'}</p>
+                    <p><strong>도착 요청시간:</strong> ${arrivalDateTime}</p>
+                </div>`;
+
+            if (data.additionalRequests && data.additionalRequests.trim()) {
+                content += `
+                    <div class="preview-section">
+                        <h4>📝 기타 요청사항</h4>
+                        <p>${data.additionalRequests}</p>
+                    </div>`;
+            }
+
+            content += `
+                <div class="preview-section">
+                    <h4>📧 발송 정보</h4>
+                    <p><strong>물류사 이메일:</strong> ${data.logisticsEmail || 'kelly@foodridge.co.kr'}</p>
+                    <p><strong>발신자:</strong> kelly@foodridge.co.kr</p>
+                </div>
+
+                <div class="preview-section">
+                    <h4>📊 물류 상세 정보</h4>
+                    <p><strong>박스 규격:</strong> 26cm 높이, 12kg 중량</p>
+                    <p><strong>파레트 규격:</strong> 15cm 높이 (2단시 30cm)</p>
+                    <p><strong>적재 방식:</strong> 1단 8박스 × 최대 5단</p>
+                </div>
+
+                <div class="preview-section">
+                    <h4>🕐 발주 정보</h4>
+                    <p><strong>신청일시:</strong> ${new Date().toLocaleString('ko-KR')}</p>
+                    <p><strong>시스템:</strong> 푸드릿지 물류 발주 시스템</p>
+                </div>
+            `;
+
+            return content;
+        }
+
+        // 폼 제출 처리
+        document.getElementById('logisticsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // 버튼 상태 변경
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="loading"></span>전송 중...';
+            
+            // 메시지 숨기기
+            successMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
+            
+            // 폼 데이터 수집
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            // 체크박스 값 처리
+            data.usePallet = document.getElementById('usePallet').checked;
+            data.doublePallet = document.getElementById('doublePallet').checked;
+            data.loadingManual = document.getElementById('loadingManual').checked;
+            data.unloadingManual = document.getElementById('unloadingManual').checked;
+            
+            // 물류사 이메일
+            data.logisticsEmail = document.getElementById('logisticsEmail').value;
+            
+            // 창고 정보 추가
+            data.warehouseName = "KCP 동안성 콜드체인센터";
+            data.warehouseAddress = "경기도 안성시 일죽면 주천리 73번지";
+            data.warehouseContact = "박기천 팀장님 (010-7706-7877)";
+            data.warehouseNote = "목적지 도착후 우측램프 진입";
+            
+            // 계산된 정보 추가
+            if (data.usePallet) {
+                const boxCount = parseInt(data.boxCount);
+                const totalWeight = boxCount * 12;
+                const palletCount = Math.ceil(boxCount / 40);
+                data.totalWeight = totalWeight;
+                data.calculatedInfo = `총 중량: ${totalWeight}kg, 파레트 수: ${palletCount}개`;
+            }
+
+            // 회신 링크 생성을 위한 발주 정보 인코딩
+            const orderId = 'ORD' + Date.now(); // 고유 발주 ID 생성
+            const responseUrl = generateResponseUrl({
+                orderId: orderId,
+                loadingTime: data.loadingTime,
+                product: data.productName,
+                boxCount: data.boxCount,
+                destination: data.destination,
+                contact: data.destinationContact,
+                arrivalTime: data.arrivalTime,
+                usePallet: data.usePallet,
+                palletCount: data.usePallet ? Math.ceil(parseInt(data.boxCount) / 40) : 0,
+                palletLayers: data.doublePallet ? '2단 (30cm)' : '1단 (15cm)'
+            });
+
+            // EmailJS로 이메일 전송
+            emailjs.send("service_9od6tgr", "template_xk0n34j", {
+                to_email: data.logisticsEmail, // 사용자가 입력한 물류사 이메일
+                from_email: "kelly@foodridge.co.kr",
+                warehouse_name: data.warehouseName,
+                warehouse_address: data.warehouseAddress,
+                warehouse_contact: data.warehouseContact,
+                warehouse_note: data.warehouseNote,
+                loading_time: data.loadingTime,
+                product_name: data.productName,
+                box_count: data.boxCount,
+                total_weight: (parseInt(data.boxCount) * 12).toString(),
+                use_pallet: data.usePallet ? "예" : "아니오",
+                pallet_layers: data.doublePallet ? "2단 (30cm)" : "1단 (15cm)",
+                pallet_count: data.usePallet ? Math.ceil(parseInt(data.boxCount) / 40).toString() : "0",
+                pallet_height: data.palletHeight || "0",
+                loading_manual: data.loadingManual ? "예" : "아니오",
+                unloading_manual: data.unloadingManual ? "예" : "아니오",
+                destination_address: data.destination,
+                destination_contact: data.destinationContact,
+                arrival_time: data.arrivalTime,
+                additional_requests: data.additionalRequests || "없음",
+                order_date: new Date().toLocaleString('ko-KR'),
+                response_url: responseUrl // 회신 링크 추가
+            })
+                .then(function(response) {
+                    console.log('SUCCESS!', response.status, response.text);
+                    successMessage.style.display = 'block';
+                    document.querySelector('.container').scrollIntoView({ behavior: 'smooth' });
+                    
+                    // 폼 초기화 (선택사항)
+                    // document.getElementById('logisticsForm').reset();
+                }, function(error) {
+                    console.log('FAILED...', error);
+                    errorMessage.textContent = '전송 중 오류가 발생했습니다: ' + error.text;
+                    errorMessage.style.display = 'block';
+                    document.querySelector('.container').scrollIntoView({ behavior: 'smooth' });
+                })
+                .finally(function() {
+                    // 버튼 상태 복원
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '발주 신청하기';
+                });
+        });
+
+        function generateEmailBody(data) {
+            const loadingDateTime = data.loadingTime;
+            const arrivalDateTime = data.arrivalTime;
+            
+            let body = `
+푸드릿지 물류 발주 신청서
+
+=== 출발지 정보 ===
+• 창고명: ${data.warehouseName}
+• 주소: ${data.warehouseAddress}
+• 담당자: ${data.warehouseContact}
+• 비고: ${data.warehouseNote}
+• 상차시간: ${loadingDateTime}
+
+=== 상품 정보 ===
+• 제품명: ${data.productName}
+• 박스수: ${data.boxCount}개
+• 총 중량: ${parseInt(data.boxCount) * 12}kg
+
+=== 파레트 정보 ===`;
+
+            if (data.usePallet) {
+                const boxCount = parseInt(data.boxCount);
+                const palletCount = Math.ceil(boxCount / 40);
+                const fullPallets = Math.floor(boxCount / 40);
+                const remainingBoxes = boxCount % 40;
+                const palletBaseHeight = data.doublePallet ? 30 : 15;
+                
+                body += `
+• 파레트 사용: 예
+• 파레트 깔기: ${data.doublePallet ? '2단 (30cm)' : '1단 (15cm)'}
+• 총 파레트 수: ${palletCount}개
+• 완전 파레트: ${fullPallets}개
+${remainingBoxes > 0 ? `• 부분 파레트: 1개 (${remainingBoxes}박스)` : ''}
+• 파레트당 적재량: 40박스 (1단 8박스 × 5단)
+• 최대 파레트 높이: ${palletBaseHeight + 130}cm`;
+            } else {
+                body += `
+• 파레트 사용: 아니오
+• 상차시 기사 수작업: ${data.loadingManual ? '예' : '아니오'}
+• 하차시 기사 수작업: ${data.unloadingManual ? '예' : '아니오'}`;
+            }
+
+            body += `
+
+=== 도착지 정보 ===
+• 도착지 주소: ${data.destination}
+• 담당자 연락처: ${data.destinationContact}
+• 도착 요청시간: ${arrivalDateTime}`;
+
+            if (data.additionalRequests && data.additionalRequests.trim()) {
+                body += `
+
+=== 기타 요청사항 ===
+${data.additionalRequests}`;
+            }
+
+            body += `
+
+=== 발송 정보 ===
+• 물류사 이메일: ${data.logisticsEmail}
+• 발신자: kelly@foodridge.co.kr
+
+=== 물류 상세 정보 ===
+• 박스 규격: 26cm 높이, 12kg 중량
+• 파레트 규격: 15cm 높이 (2단시 30cm)
+• 적재 방식: 1단 8박스 × 최대 5단
+
+---
+발주 신청일시: ${new Date().toLocaleString('ko-KR')}
+시스템: 푸드릿지 물류 발주 시스템
+            `;
+
+            return body;
+        }
+
+        // 회신 링크 URL 생성 함수
+        function generateResponseUrl(orderData) {
+            // 회신 시스템 페이지의 기본 URL (실제 배포시 수정 필요)
+            const baseUrl = window.location.origin + window.location.pathname.replace('foodridge_logistics_system.html', 'logistics_response_system.html');
+            
+            // URL 파라미터로 발주 정보 전달
+            const params = new URLSearchParams({
+                orderId: orderData.orderId,
+                loadingTime: orderData.loadingTime,
+                product: orderData.product,
+                boxCount: orderData.boxCount,
+                destination: orderData.destination,
+                contact: orderData.contact,
+                arrivalTime: orderData.arrivalTime,
+                usePallet: orderData.usePallet,
+                palletCount: orderData.palletCount,
+                palletLayers: orderData.palletLayers
+            });
+            
+            return `${baseUrl}?${params.toString()}`;
+        }
+
+        // 초기 설정
+        document.addEventListener('DOMContentLoaded', function() {
+            // 현재 날짜와 시간을 24시간 형식으로 설정
+            const now = new Date();
+            const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+            
+            // 내일 오전 9시로 기본 설정 (24시간 형식)
+            const year = tomorrow.getFullYear();
+            const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
+            const day = String(tomorrow.getDate()).padStart(2, '0');
+            const tomorrowString = `${year}-${month}-${day} 09:00`;
+            
+            document.getElementById('loadingTime').placeholder = tomorrowString;
+            document.getElementById('arrivalTime').placeholder = tomorrowString;
+        });
+    </script>
+</body>
+</html>
